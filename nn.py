@@ -30,11 +30,14 @@ def nn(input,label,actiFunc,layer2num,layer3num): #nn for binary classification
     while True:
         aAll=[];zAll=[]
         for i in range(0,input.shape[0]):
-            a=[];z=[]
-            a.append(np.reshape(input[i,:],(2,1)))
-            z.append(np.reshape(input[i,:],(2,1)))
+          a=[];z=[]
+          a.append(np.reshape(input[i,:],(2,1)))
+          z.append(np.reshape(input[i,:],(2,1)))
           for j in range(1,4):
             z.append(np.matmul(weight[j-1],a[j-1])+bias[j-1])
             a.append(vAct(z[j]))
+          aAll.append(a)
+          zAll.append(z)
+
 
 
