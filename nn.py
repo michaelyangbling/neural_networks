@@ -47,10 +47,10 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
     inputDim=input.shape[1] #gradient vanishing?
     numPara = layer2num * inputDim  + 2*layer2num  + 1
     num=input.shape[0]
-    vLast=np.vectorize(actiFunc)   # actiFunc and deriv only apply to last layer
-    vDerivLast=np.vectorize(deriv)
-    vAct = np.vectorize(relu)  # only use relu for  acti other than last layer
-    vDerivAct = np.vectorize(derivRelu)
+    vLast=np.vectorize(sigmoid)   # actiFunc and deriv only apply to last layer
+    vDerivLast=np.vectorize(derivSigmoid)
+    vAct = np.vectorize(actiFunc)  # only use relu for  acti other than last layer
+    vDerivAct = np.vectorize(deriv)
     weight=[]
     weight.append(np.random.normal( 0,1,(layer2num,inputDim)) )
     weight.append(np.random.normal(0,1,(1, layer2num)) )
@@ -83,7 +83,7 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
           delta=list(range(0,3))
           y=float(labels[batch[k],:])
           zLast=float(zAll[k][2])
-          delta[2]=np.array([[ ( y/actiFunc(zLast) + (y-1)/(1-actiFunc(zLast)) ) * deriv( zLast ) ]] )
+          delta[2]=np.array([[ ( y/sigmoid(zLast) + (y-1)/(1-sigmoid(zLast)) ) * derivSigmoid( zLast ) ]] )
           delta[1]=np.multiply( np.matmul( weight[1].transpose(), delta[2] ), vDerivAct( zAll[k][1] ) )
           for l in range(0,2):
             dWeight[l]=dWeight[l]+np.matmul( delta[l+1], aAll[k][l].transpose() )
@@ -106,8 +106,8 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
 
 def predict(model, input, actiFunc):
     num = input.shape[0]
-    vLast = np.vectorize(actiFunc)
-    vAct=np.vectorize(relu)
+    vLast = np.vectorize(sigmoid)
+    vAct=np.vectorize(actiFunc)
     weight=model[0]
     bias=model[1]
     aAll = []
@@ -130,17 +130,18 @@ def predict(model, input, actiFunc):
         labels.append(aAll[k][2])
     return labels
 # trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChange, batchSize)
-model=trainNn(scaledTrn,data['Y_train'],sigmoid,derivSigmoid,10,0.1,0,0.0001,200)
-print(predict(model,scaledTrn,sigmoid))
+model=trainNn(scaledTrn,data['Y_train'],tanh,derivTanh,10,0.1,0,0.0001,200)
+print(predict(model,scaledTrn,tanh))
 
 
 result=[]
-for i in predict(model, scaledTrn, sigmoid):
+for i in predict(model, scaledTrn, relu):
     p=float(i)
     if p>0.5:
         result.append(1)
     else:
         result.append(0)
 print(np.array(result)==data['Y_train'].flatten())
+print((np.array(result)==data['Y_train'].flatten()).mean())
 print(model[0])
 print(model[1])
