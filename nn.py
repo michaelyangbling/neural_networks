@@ -17,7 +17,8 @@ def sigmoid(x):
     return 1/(1+math.exp(-x))
 def derivSigmoid(x):
     return sigmoid(x) * ( 1-sigmoid(x) )
-def nn(input,labels,actiFunc, deriv, layer2num,layer3num): #nn for binary classification
+def nn(input,labels,actiFunc, deriv, layer2num,layer3num,learnRate,reguPara): #nn for binary classification
+    numPara=layer2num*inputDim+layer3num*layer2num+layer3num+layer2num+ layer3num +1
     inputDim=input.shape[1]
     num=input.shape[0]
     vAct = np.vectorize(actiFunc)
@@ -43,10 +44,12 @@ def nn(input,labels,actiFunc, deriv, layer2num,layer3num): #nn for binary classi
           zAll.append(z)
             
         dWeight=[]
-        dWeight=dWeight.append(np.zeros((layer2num,inputDim)))
-        dWeight=dWeight.append(np.zeros((layer3num, layer2num)))
-        dweight=dWeight.append(np.zeros((1,layer3num)))
-        
+        dWeight.append(np.zeros((layer2num,inputDim)))
+        dWeight.append(np.zeros((layer3num, layer2num)))
+        dWeight.append(np.zeros((1,layer3num)))
+        dBias.append(np.zeros( (layer2num,1) ))
+        dBias.append(np.zeros( (layer3num, 1) ))
+        dBias.append(np.zeros( (1, 1) ))
         for k in range(0,num): #backward prop #begin with zero in code,but with 1 in math
           delta=list(range(0,4))
           y=float(labels[k,:])
@@ -55,7 +58,20 @@ def nn(input,labels,actiFunc, deriv, layer2num,layer3num): #nn for binary classi
           delta[2]=np.multiply( np.matmul( weight[k][2].transpose(), delta[3] ), vDerivAct( zAll[k][2] ) )
           delta[1]=np.multiply( np.matmul( weight[k][1].transpose(), delta[2] ), vDerivAct( zAll[k][1] ) )
           for l in range(0,3):
-            dWeight[l]=d
+            dWeight[l]=dWeight[l]+np.matmul( delta[l+1], aAll[k][l].transpose() )
+            dBias[l]=dBias[l]+delta[l+1]
+        change=0
+        for l in range(0,3):
+          changeWeight=learnRate * ( dWeight[l] / num + reguPara * weight[l] )
+          change+= np.linalg.norm(changeWeight)**2
+          weight[l]=weight[l] - changeWeight 
+          changeBias=learnRate * ( dBias[l] / num )
+          change+= np.linalg.norm(changeBias)**2
+          bias[l] = bias[l] - changeBias
+        if change / numPara <0.01:
+          return (weight,bias)
+        
+          
           
         
 
