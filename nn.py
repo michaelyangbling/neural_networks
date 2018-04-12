@@ -57,6 +57,7 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
     bias=[]
     bias.append(np.random.normal(0,1,(layer2num,1)) )
     bias.append(np.random.normal(0,1,(1, 1)))
+
     while True:
         batch = random.sample(range(0, num), batchSize)
         aAll=[];zAll=[] #forward prop
@@ -99,7 +100,7 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
 
         # if (change / numPara)**0.5 <stopChange:
         #   return (weight,bias) #nn(data['X_train'],data['Y_train'],derivSigmoid, sigmoid, 2,1,0.1,0.1)
-        if count>20:
+        if count>3:
           return (weight, bias)
         count+=1
 
@@ -129,7 +130,7 @@ def predict(model, input, actiFunc):
         labels.append(aAll[k][2])
     return labels
 # trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChange, batchSize)
-model=trainNn(scaledTrn,data['Y_train'],sigmoid,derivSigmoid,10,1,0,0.0001,200)
+model=trainNn(scaledTrn,data['Y_train'],sigmoid,derivSigmoid,10,0.1,0,0.0001,200)
 print(predict(model,scaledTrn,sigmoid))
 
 
