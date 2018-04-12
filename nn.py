@@ -47,6 +47,7 @@ def nn(input,labels,actiFunc, deriv, layer2num,layer3num,learnRate,reguPara): #n
         dWeight.append(np.zeros((layer2num,inputDim)))
         dWeight.append(np.zeros((layer3num, layer2num)))
         dWeight.append(np.zeros((1,layer3num)))
+        dBias=[]
         dBias.append(np.zeros( (layer2num,1) ))
         dBias.append(np.zeros( (layer3num, 1) ))
         dBias.append(np.zeros( (1, 1) ))
@@ -69,7 +70,7 @@ def nn(input,labels,actiFunc, deriv, layer2num,layer3num,learnRate,reguPara): #n
           change+= np.linalg.norm(changeBias)**2
           bias[l] = bias[l] - changeBias
         if change / numPara <0.01:
-          return (weight,bias)
+          return (weight,bias) #
         
           
           
