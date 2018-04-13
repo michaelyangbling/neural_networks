@@ -102,7 +102,7 @@ def trainNn(input,labels,actiFunc, deriv, layer2num,learnRate,reguPara,stopChang
           bias[l] = bias[l] - changeBias
           pass
 
-        if (change / numPara) <stopChange or count>=200:
+        if (change / numPara) <stopChange or count>=350:
           return (weight,bias,count) #nn(data['X_train'],data['Y_train'],derivSigmoid, sigmoid, 2,1,0.1,0.1)
         # if
         #   return (weight, bias,count)
@@ -178,24 +178,25 @@ for i in range(0,len(trnClass)): #0 corresponds to color red,1:blue
 #         trnClass2[i] = "o"
 plt.scatter(trnX2,trnX1,c=trnClass)
 plt.show()
-
+func=relu  # specify actiFunc here
+actFunc=derivRelu # specify actiFunc( derivative )  here
 def cv(nueron):
   reguDict={}
   for reguPara in (0, 0.0001, 0.01, 0.1, 1, 10):
-    model = trainNn(scaledTrn, data['Y_train'], relu, derivRelu, nueron, 1, reguPara, 0.0000001, 200)
-    reguDict[reguPara]=getAcc(toLabels(predict(model, scaledValid, relu)), data['Y_validation'].flatten().tolist())
+    model = trainNn(scaledTrn, data['Y_train'], func, actFunc, nueron, 1, reguPara, 0.000000001, 200)
+    reguDict[reguPara]=getAcc(toLabels(predict(model, scaledValid, func)), data['Y_validation'].flatten().tolist())
   print(str(nueron)+" neuron CV result: ")
   print(reguDict)
   for i in reguDict:
     max=0
     if reguDict[i]>=max:
       winner=i
-  model = trainNn(scaledTrn, data['Y_train'], relu, derivRelu, nueron, 1, winner, 0.0000001, 200)
+  model = trainNn(scaledTrn, data['Y_train'], func, actFunc, nueron, 1, winner, 0.000000001, 200)
 
   print("winner parameter: "+str(winner)+" training error: ")
-  print(getAcc(toLabels(predict(model, scaledTrn, relu)), data['Y_train'].flatten().tolist()))
+  print(getAcc(toLabels(predict(model, scaledTrn, func)), data['Y_train'].flatten().tolist()))
   print("winner parameter test error:")
-  print(getAcc(toLabels(predict(model, scaledTst, relu)), data['Y_test'].flatten().tolist()))
+  print(getAcc(toLabels(predict(model, scaledTst, func)), data['Y_test'].flatten().tolist()))
 
 cv(2)
 cv(10)
